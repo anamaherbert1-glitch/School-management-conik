@@ -1,21 +1,36 @@
-export default function DashboardPage() {
-  const stats = [
-    ['Étudiants', '0'],
-    ['Enseignants', '0'],
-    ['Filières', '0'],
-    ['Paiements du mois', '0 FCFA'],
+import { redirect } from 'next/navigation';
+import { createClient } from '../../lib/supabase/server';
+import SignOutButton from './sign-out-button';
+
+export default async function DashboardPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
+
+  const { data: profile } = await supabase.from('profiles').select('full_name, email').eq('id', user.id).maybeSingle();
+  const stats = [['Étudiants','0'],['Enseignants','0'],['Filières','0'],['Paiements du mois','0 FCFA']];
+  const modules = [
+    ['Admissions','Candidatures, inscriptions et dossiers.'],
+    ['Étudiants','Dossiers, parcours et situations.'],
+    ['Finances','Frais, paiements et débiteurs.'],
+    ['Pédagogie','Programmes, matières, notes et emplois du temps.'],
   ];
 
   return (
-    <main style={{minHeight:'100vh',background:'#f7f8fb',fontFamily:'Inter,system-ui,sans-serif',padding:'32px'}}>
-      <header style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:20,marginBottom:32}}>
-        <div><p style={{margin:0,fontSize:12,fontWeight:800,letterSpacing:'.1em',color:'#64748b'}}>SCHOOL MANAGEMENT CONIK</p><h1 style={{margin:'6px 0 0',fontSize:32,color:'#0f172a'}}>Tableau de bord</h1></div>
-        <a href="/login" style={{color:'#334155',textDecoration:'none'}}>Se déconnecter</a>
-      </header>
-      <section style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:16}}>
-        {stats.map(([label,value]) => <article key={label} style={{background:'#fff',border:'1px solid #e7eaf0',borderRadius:18,padding:22}}><p style={{margin:0,color:'#64748b',fontSize:13}}>{label}</p><strong style={{display:'block',marginTop:10,fontSize:26,color:'#0f172a'}}>{value}</strong></article>)}
+    <main className="dashboard-shell">
+      <aside className="dashboard-sidebar">
+        <div className="dashboard-brand"><span>C</span><div><strong>CONIK</strong><small>School Management</small></div></div>
+        <nav aria-label="Navigation principale">
+          <a className="active" href="/dashboard">Vue d’ensemble</a><a href="#admissions">Admissions</a><a href="#students">Étudiants</a><a href="#finance">Finances</a><a href="#academics">Pédagogie</a><a href="#exams">Examens</a><a href="#documents">Documents</a><a href="#communication">Communication</a><a href="#settings">Paramètres</a>
+        </nav>
+        <SignOutButton />
+      </aside>
+      <section className="dashboard-main">
+        <header className="dashboard-header"><div><p className="eyebrow">ADMINISTRATION</p><h1>Tableau de bord</h1><p className="dashboard-muted">Bienvenue{profile?.full_name ? `, ${profile.full_name}` : ''}.</p></div><div className="user-chip">{profile?.email ?? user.email}</div></header>
+        <section className="stat-grid">{stats.map(([label,value]) => <article className="stat-card" key={label}><span>{label}</span><strong>{value}</strong><small>Données réelles bientôt connectées</small></article>)}</section>
+        <section className="dashboard-panel"><div><h2>Activité récente</h2><p>Aucune activité enregistrée pour le moment.</p></div><span className="status-pill">Système prêt</span></section>
+        <section className="module-grid">{modules.map(([title,description]) => <article key={title}><h3>{title}</h3><p>{description}</p><a href={`#${title.toLowerCase()}`}>Ouvrir →</a></article>)}</section>
       </section>
-      <section style={{marginTop:24,background:'#fff',border:'1px solid #e7eaf0',borderRadius:18,padding:24}}><h2 style={{marginTop:0,color:'#0f172a'}}>Bienvenue dans l'administration</h2><p style={{color:'#64748b'}}>Les modules seront activés progressivement et alimentés par les données réelles de l'établissement.</p></section>
     </main>
   );
 }
