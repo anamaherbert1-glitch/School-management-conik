@@ -1,8 +1,12 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '../../lib/supabase/client';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const supabase = createClient();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -12,15 +16,14 @@ export default function LoginPage() {
     event.preventDefault();
     setError('');
     setLoading(true);
-    try {
-      // Supabase Auth will be wired here after the browser client is added.
-      if (!email || !password) throw new Error('Veuillez renseigner votre email et votre mot de passe.');
-      setError('Authentification Supabase en cours d’intégration.');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue.');
-    } finally {
-      setLoading(false);
+    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (authError) {
+      setError('Email ou mot de passe incorrect.');
+      return;
     }
+    router.replace('/dashboard');
+    router.refresh();
   }
 
   return (
@@ -32,9 +35,9 @@ export default function LoginPage() {
         <p className="subtitle">Connectez-vous à votre espace de gestion.</p>
         <form onSubmit={handleSubmit} className="login-form">
           <label htmlFor="email">Adresse email</label>
-          <input id="email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vous@ecole.com" />
+          <input id="email" required type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vous@ecole.com" />
           <label htmlFor="password">Mot de passe</label>
-          <input id="password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
+          <input id="password" required minLength={6} type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
           <button type="submit" disabled={loading}>{loading ? 'Connexion…' : 'Se connecter'}</button>
           {error && <p className="form-message" role="alert">{error}</p>}
         </form>
