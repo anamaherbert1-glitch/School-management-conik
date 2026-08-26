@@ -2,11 +2,9 @@
 
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '../../lib/supabase/client';
 
 export default function LoginPage() {
   const router = useRouter();
-  const supabase = createClient();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,14 +14,24 @@ export default function LoginPage() {
     event.preventDefault();
     setError('');
     setLoading(true);
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (authError) {
-      setError('Email ou mot de passe incorrect.');
-      return;
+
+    try {
+      const { createClient } = await import('../../lib/supabase/client');
+      const supabase = createClient();
+      const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (authError) {
+        setError('Email ou mot de passe incorrect.');
+        return;
+      }
+
+      router.replace('/dashboard');
+      router.refresh();
+    } catch {
+      setError('Le service de connexion est momentanément indisponible.');
+    } finally {
+      setLoading(false);
     }
-    router.replace('/dashboard');
-    router.refresh();
   }
 
   return (
