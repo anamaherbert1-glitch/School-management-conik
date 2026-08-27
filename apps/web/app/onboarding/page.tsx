@@ -1,28 +1,42 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '../../lib/supabase/client'
 
 export default function OnboardingPage() {
+  const router = useRouter()
   const [form, setForm] = useState({ name: '', slug: '', email: '', phone: '', address: '', city: '', logoUrl: '' })
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(false)
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true); setStatus('Création de votre établissement…')
+    setLoading(true)
+    setStatus('Création de votre établissement…')
     try {
-      // The Supabase browser client is intentionally loaded only when configured.
-      const { createClient } = await import('@supabase/supabase-js')
-      const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Votre session a expiré. Veuillez vous reconnecter.')
+
       const { data, error } = await supabase.rpc('create_school_for_current_user', {
-        p_name: form.name, p_slug: form.slug || form.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-'),
-        p_email: form.email || null, p_phone: form.phone || null, p_address: form.address || null,
-        p_city: form.city || null, p_logo_url: form.logoUrl || null,
+        p_name: form.name,
+        p_slug: form.slug || form.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-'),
+        p_email: form.email || null,
+        p_phone: form.phone || null,
+        p_address: form.address || null,
+        p_city: form.city || null,
+        p_logo_url: form.logoUrl || null,
       })
       if (error) throw error
-      setStatus(`Établissement créé avec succès. Organisation : ${data}`)
-    } catch (err: any) { setStatus(err?.message || 'Impossible de créer l’établissement.') }
-    finally { setLoading(false) }
+      if (!data) throw new Error('L’établissement n’a pas pu être créé.')
+      setStatus('Établissement créé avec succès. Redirection…')
+      router.replace('/dashboard')
+      router.refresh()
+    } catch (err: any) {
+      setStatus(err?.message || 'Impossible de créer l’établissement.')
+      setLoading(false)
+    }
   }
 
   const set = (key: string, value: string) => setForm(v => ({ ...v, [key]: value }))
