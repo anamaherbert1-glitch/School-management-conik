@@ -1,0 +1,27 @@
+'use client'
+
+import { useMemo, useState } from 'react'
+
+type ElementType='text'|'logo'|'student_photo'|'field'|'table'|'watermark'
+type Element={id:string;type:ElementType;label:string;x:number;y:number;width:number;height:number;fontSize:number;content:string;field?:string}
+
+const fields=[['student_name','Nom de l’élève'],['student_number','Matricule'],['class_name','Classe'],['academic_year','Année scolaire'],['school_name','Nom établissement'],['general_average','Moyenne générale'],['rank','Rang'],['appreciation','Appréciation']]
+const starter:Element[]=[
+ {id:'school',type:'text',label:'Établissement',x:90,y:55,width:570,height:48,fontSize:22,content:'{{school_name}}'},
+ {id:'title',type:'text',label:'Titre',x:160,y:120,width:430,height:45,fontSize:25,content:'BULLETIN SCOLAIRE'},
+ {id:'student',type:'field',label:'Élève',x:45,y:190,width:300,height:32,fontSize:13,content:'Élève : {{student_name}}'},
+ {id:'class',type:'field',label:'Classe',x:390,y:190,width:300,height:32,fontSize:13,content:'Classe : {{class_name}}'},
+ {id:'table',type:'table',label:'Résultats par matière',x:35,y:250,width:700,height:330,fontSize:12,content:'Matière | Interrogation | Devoir | Contrôle | Examen | Moyenne | Coef.'},
+ {id:'average',type:'field',label:'Moyenne générale',x:460,y:605,width:275,height:35,fontSize:16,content:'Moyenne générale : {{general_average}} / 20'},
+ {id:'watermark',type:'watermark',label:'Filigrane',x:180,y:330,width:400,height:140,fontSize:34,content:'ÉTABLISSEMENT'}
+]
+
+export default function BulletinTemplatesPage(){
+ const [elements,setElements]=useState(starter),[selected,setSelected]=useState('table'),[name,setName]=useState('Bulletin collège - Trimestre'),[saved,setSaved]=useState(false)
+ const active=elements.find(e=>e.id===selected) || elements[0]
+ const update=(patch:Partial<Element>)=>setElements(es=>es.map(e=>e.id===active.id?{...e,...patch}:e))
+ const add=(type:ElementType)=>{const id=`e${Date.now()}`;const labels:{[k in ElementType]:string}={text:'Texte',logo:'Logo école',student_photo:'Photo élève',field:'Champ dynamique',table:'Tableau des notes',watermark:'Filigrane'};const content=type==='field'?'{{student_name}}':type==='watermark'?'ÉTABLISSEMENT':type==='table'?'Matière | Note | Coef.':'Votre texte';setElements(es=>[...es,{id,type,label:labels[type],x:120,y:220,width:type==='table'?650:260,height:type==='table'?240:45,fontSize:14,content}]);setSelected(id);setSaved(false)}
+ const remove=()=>{if(elements.length>1){setElements(es=>es.filter(e=>e.id!==active.id));setSelected(elements.find(e=>e.id!==active.id)?.id||'')}}
+ const preview=useMemo(()=>elements,[elements])
+ return <main className="template-editor"><header className="template-top"><div><a className="back-link" href="/dashboard">← Tableau de bord</a><p className="eyebrow">CONFIGURATION · BULLETINS</p><h1>Éditeur de modèles</h1><p>Concevez le modèle A4 qui sera utilisé pour générer les bulletins.</p></div><div className="template-actions"><button className="student-secondary" onClick={()=>setElements(starter)}>Réinitialiser</button><button className="student-primary" onClick={()=>{setSaved(true);setTimeout(()=>setSaved(false),2500)}}>Enregistrer le modèle</button></div></header><div className="editor-layout"><aside className="toolbox"><h3>Éléments</h3><p>Glissez conceptuellement vos blocs dans la page A4.</p><div className="tool-grid">{(['text','logo','student_photo','field','table','watermark'] as ElementType[]).map(t=><button key={t} onClick={()=>add(t)}>{t==='text'?'T':t==='logo'?'▣':t==='student_photo'?'▧':t==='field'?'{}':t==='table'?'▤':'◌'}<span>{t==='text'?'Texte':t==='logo'?'Logo':t==='student_photo'?'Photo élève':t==='field'?'Champ dynamique':t==='table'?'Notes / résultats':'Filigrane'}</span></button>)}</div><h3>Champs dynamiques</h3><div className="field-list">{fields.map(([key,label])=><button key={key} onClick={()=>add('field')}>{`{{${key}}}`}<span>{label}</span></button>)}</div></aside><section className="canvas-area"><div className="paper" style={{position:'relative'}}>{preview.map(e=><div key={e.id} onClick={()=>setSelected(e.id)} className={`canvas-element ${selected===e.id?'is-selected':''} type-${e.type}`} style={{position:'absolute',left:e.x,top:e.y,width:e.width,height:e.height,fontSize:e.fontSize}}>{e.type==='logo'?<div className="placeholder">LOGO</div>:e.type==='student_photo'?<div className="photo-placeholder">PHOTO<br/>ÉLÈVE</div>:e.content}</div>)}</div></section><aside className="properties"><h3>Propriétés</h3><label>Nom du modèle<input value={name} onChange={e=>{setName(e.target.value);setSaved(false)}}/></label><hr/><h4>Élément sélectionné</h4><label>Contenu<textarea value={active.content} onChange={e=>update({content:e.target.value})}/></label><label>Taille du texte<input type="number" min="8" max="60" value={active.fontSize} onChange={e=>update({fontSize:Number(e.target.value)})}/></label><div className="prop-grid"><label>X<input type="number" value={active.x} onChange={e=>update({x:Number(e.target.value)})}/></label><label>Y<input type="number" value={active.y} onChange={e=>update({y:Number(e.target.value)})}/></label><label>Largeur<input type="number" value={active.width} onChange={e=>update({width:Number(e.target.value)})}/></label><label>Hauteur<input type="number" value={active.height} onChange={e=>update({height:Number(e.target.value)})}/></label></div><button className="danger-button" onClick={remove}>Supprimer l’élément</button>{saved&&<div className="saved-message">✓ Modèle prêt à être enregistré.</div>}</aside></div></main>
+}
