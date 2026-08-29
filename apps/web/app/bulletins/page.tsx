@@ -1,0 +1,16 @@
+'use client'
+
+import { useState } from 'react'
+
+type Student={id:string;name:string;number:string;average:number;rank:number}
+const demo:Student[]=[{id:'1',name:'Kossi Mensah',number:'MAT-0001',average:14.42,rank:1},{id:'2',name:'Ama Lawson',number:'MAT-0002',average:13.58,rank:2},{id:'3',name:'Jean Doe',number:'MAT-0003',average:12.9,rank:3}]
+
+export default function BulletinsPage(){const [className,setClassName]=useState('6ème A'),[period,setPeriod]=useState('Trimestre 1'),[students,setStudents]=useState(demo),[status,setStatus]=useState(''),[selected,setSelected]=useState<Student|null>(null)
+ const generate=()=>{setStatus(`✓ ${students.length} bulletin(s) généré(s) avec le modèle sélectionné.`)}
+ const one=(s:Student)=>{setSelected(s);setStatus(`✓ Bulletin de ${s.name} prêt à être généré.`)}
+ return <main className="bulletins-page"><header className="grades-header"><div><a className="back-link" href="/dashboard">← Tableau de bord</a><p className="eyebrow">PÉDAGOGIE · BULLETINS</p><h1>Génération des bulletins</h1><p>Utilisez un modèle visuel et les moyennes calculées pour produire les bulletins.</p></div><button className="student-primary" onClick={generate}>Générer tous les bulletins</button></header>
+ <section className="grade-filters"><label>Classe<select value={className} onChange={e=>setClassName(e.target.value)}><option>6ème A</option><option>6ème B</option><option>5ème A</option></select></label><label>Période<select value={period} onChange={e=>setPeriod(e.target.value)}><option>Trimestre 1</option><option>Trimestre 2</option><option>Trimestre 3</option></select></label><label>Modèle<select><option>Bulletin collège - Trimestre</option></select></label><div className="bulletin-summary"><b>{students.length}</b><span>élèves concernés</span></div></section>
+ {status&&<div className="grade-message">{status}</div>}
+ <section className="students-table-wrap"><table><thead><tr><th>Élève</th><th>Matricule</th><th>Moyenne générale</th><th>Rang</th><th>Action</th></tr></thead><tbody>{students.map(s=><tr key={s.id}><td><b>{s.name}</b></td><td><code>{s.number}</code></td><td><strong>{s.average.toFixed(2)} / 20</strong></td><td>{s.rank}e</td><td><button className="student-secondary" onClick={()=>one(s)}>Générer</button></td></tr>)}</tbody></table></section>
+ {selected&&<div className="modal-backdrop" onMouseDown={e=>e.currentTarget===e.target&&setSelected(null)}><section className="student-modal bulletin-preview"><header><div><p className="eyebrow">APERÇU</p><h2>Bulletin — {selected.name}</h2></div><button className="modal-close" onClick={()=>setSelected(null)}>×</button></header><div className="mini-paper"><div className="paper-school">NOM DE L'ÉTABLISSEMENT</div><h3>BULLETIN SCOLAIRE</h3><p><b>Élève :</b> {selected.name} · <b>Classe :</b> {className}</p><p><b>Période :</b> {period}</p><hr/><p>Résultats par matière — données issues des calculs de moyennes</p><h3>Moyenne générale : {selected.average.toFixed(2)} / 20</h3><p>Rang : {selected.rank}e</p></div><footer><button className="student-secondary" onClick={()=>setSelected(null)}>Fermer</button><button className="student-primary" onClick={()=>setStatus(`✓ Bulletin individuel de ${selected.name} généré.`)}>Générer le bulletin</button></footer></section></div>}
+ </main>}
