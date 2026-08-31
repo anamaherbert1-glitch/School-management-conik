@@ -23,15 +23,31 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const pathname = request.nextUrl.pathname
 
-  if (!user && pathname.startsWith('/dashboard')) {
+  // Public routes stay accessible without an account.
+  const isPublic = pathname === '/login' || pathname === '/apply' || pathname.startsWith('/apply/')
+  const isProtected = !isPublic && (
+    pathname.startsWith('/dashboard') ||
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/students') ||
+    pathname.startsWith('/classes') ||
+    pathname.startsWith('/grades') ||
+    pathname.startsWith('/averages') ||
+    pathname.startsWith('/bulletins') ||
+    pathname.startsWith('/bulletin-templates') ||
+    pathname.startsWith('/onboarding')
+  )
+
+  if (!user && isProtected) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
+    url.searchParams.set('next', pathname)
     return NextResponse.redirect(url)
   }
 
   if (user && pathname === '/login') {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
+    url.search = ''
     return NextResponse.redirect(url)
   }
 
@@ -39,5 +55,17 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login'],
+  matcher: [
+    '/dashboard/:path*',
+    '/admin/:path*',
+    '/students/:path*',
+    '/classes/:path*',
+    '/grades/:path*',
+    '/averages/:path*',
+    '/bulletins/:path*',
+    '/bulletin-templates/:path*',
+    '/onboarding/:path*',
+    '/login',
+    '/apply/:path*',
+  ],
 }
