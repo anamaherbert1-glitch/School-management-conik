@@ -75,17 +75,17 @@ fn conik_root() -> PathBuf {
 fn create_directories(root: &Path) -> Result<(), LocalError> {
     let directories = [
         root.join("data"),
-        root.join("documents\students"),
-        root.join("documents\teachers"),
-        root.join("documents\admissions"),
-        root.join("documents\administrative"),
-        root.join("generated\bulletins"),
-        root.join("generated\transcripts"),
-        root.join("generated\certificates"),
-        root.join("generated\receipts"),
-        root.join("generated\reports"),
-        root.join("backups\automatic"),
-        root.join("backups\manual"),
+        root.join("documents").join("students"),
+        root.join("documents").join("teachers"),
+        root.join("documents").join("admissions"),
+        root.join("documents").join("administrative"),
+        root.join("generated").join("bulletins"),
+        root.join("generated").join("transcripts"),
+        root.join("generated").join("certificates"),
+        root.join("generated").join("receipts"),
+        root.join("generated").join("reports"),
+        root.join("backups").join("automatic"),
+        root.join("backups").join("manual"),
         root.join("logs"),
         root.join("config"),
     ];
@@ -106,7 +106,9 @@ fn open_database() -> Result<(Connection, PathBuf), LocalError> {
     let database_path = root.join("data").join("conik.db");
 
     let connection = Connection::open(&database_path)?;
-    connection.execute_batch("PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA synchronous = NORMAL;")?;
+    connection.execute_batch(
+        "PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA synchronous = NORMAL;",
+    )?;
     connection.execute_batch(MIGRATION_001)?;
 
     Ok((connection, database_path))
@@ -127,17 +129,21 @@ fn ensure_connection(state: &State<AppState>) -> Result<PathBuf, LocalError> {
     Ok(conik_root().join("data").join("conik.db"))
 }
 
-#[tauri::command]
-pub fn initialize_local_runtime(state: State<AppState>) -> Result<LocalRuntimeStatus, LocalError> {
-    let database_path = ensure_connection(&state)?;
+fn runtime_status(state: &State<AppState>) -> Result<LocalRuntimeStatus, LocalError> {
+    let database_path = ensure_connection(state)?;
     let guard = state.db.lock().map_err(|_| LocalError {
         code: "DB_LOCK_ERROR".into(),
         message: "Unable to acquire the local database lock".into(),
     })?;
-    let version = guard
-        .as_ref()
-        .and_then(|db| db.query_row("SELECT MAX(version) FROM schema_migrations", [], |row| row.get::<_, Option<i64>>(0)).ok())
-        .flatten();
+    let version = guard.as_ref().and_then(|db| {
+        db.query_row(
+            "SELECT MAX(version) FROM schema_migrations",
+            [],
+            |row| row.get::<_, Option<i64>>(0),
+        )
+        .ok()
+        .flatten()
+    });
 
     Ok(LocalRuntimeStatus {
         initialized: database_path.exists(),
@@ -148,8 +154,13 @@ pub fn initialize_local_runtime(state: State<AppState>) -> Result<LocalRuntimeSt
 }
 
 #[tauri::command]
+pub fn initialize_local_runtime(state: State<AppState>) -> Result<LocalRuntimeStatus, LocalError> {
+    runtime_status(&state)
+}
+
+#[tauri::command]
 pub fn get_local_runtime_status(state: State<AppState>) -> Result<LocalRuntimeStatus, LocalError> {
-    initialize_local_runtime(state)
+    runtime_status(&state)
 }
 
 #[tauri::command]
@@ -193,14 +204,31 @@ pub fn create_institution(
 
     db.execute(
         "INSERT INTO institution (id, name, slug, country_code, timezone, address, city, phone, email, website, logo_path, academic_year_label, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?13)",
-        params![id, trimmed_name, trimmed_slug, country_code, timezone, address, city, phone, email, website, logo_path, academic_year_label, timestamp],
+        params![
+            id,
+            trimmed_name,
+            trimmed_slug,
+            country_code,
+            timezone,
+            address,
+            city,
+            phone,
+            email,
+            website,
+            logo_path,
+            academic_year_label,
+            timestamp
+        ],
     )?;
 
     get_institution_from_db(db, &id)
 }
 
 #[tauri::command]
-pub fn get_institution(state: State<AppState>, id: String) -> Result<Option<LocalInstitution>, LocalError> {
+pub fn get_institution(
+    state: State<AppState>,
+    id: String,
+) -> Result<Option<LocalInstitution>, LocalError> {
     ensure_connection(&state)?;
     let guard = state.db.lock().map_err(|_| LocalError {
         code: "DB_LOCK_ERROR".into(),
