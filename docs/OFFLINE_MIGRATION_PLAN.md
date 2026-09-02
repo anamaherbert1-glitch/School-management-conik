@@ -7,9 +7,10 @@ This plan is the implementation checklist for the master architecture.
 - [x] Confirm current repository structure.
 - [x] Confirm `apps/web` is the existing application entry point.
 - [x] Confirm the workspace currently uses Next.js/React and Supabase.
-- [ ] Inventory every Supabase query and mutation by module.
-- [ ] Map every existing table to its local SQLite counterpart.
-- [ ] Identify pages that already contain reusable business logic.
+- [x] Inventory the current Supabase-backed modules and access patterns.
+- [x] Map the current schema to local SQLite ownership groups.
+- [x] Identify pages that already contain reusable business logic.
+- [x] Record the ARCH-1 audit in `docs/ARCH1_AUDIT.md`.
 
 ## B. Local platform foundation
 
