@@ -7,7 +7,9 @@
     "dev": "next dev apps/web",
     "build": "next build apps/web",
     "lint": "next lint apps/web",
-    "typecheck": "tsc -p apps/web/tsconfig.json --noEmit"
+    "typecheck": "tsc -p apps/web/tsconfig.json --noEmit",
+    "desktop:dev": "tauri dev --config apps/desktop/src-tauri/tauri.conf.json",
+    "desktop:build": "tauri build --config apps/desktop/src-tauri/tauri.conf.json"
   },
   "dependencies": {
     "@supabase/ssr": "latest",
@@ -17,6 +19,7 @@
     "react-dom": "latest"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.8.0",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
