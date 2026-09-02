@@ -39,8 +39,8 @@ Migrate institution setup and onboarding first because every later operational r
 - [x] ARCH-2C desktop onboarding persistence.
 - [x] ARCH-2D local settings.
 - [x] ARCH-2D local administrator bootstrap.
-- [ ] Academic year.
-- [ ] Semesters.
+- [x] Academic year.
+- [x] Semesters.
 - [ ] Levels.
 - [ ] Departments.
 - [ ] Programs.
