@@ -36,6 +36,7 @@ This plan is the implementation checklist for the master architecture.
 Migrate institution setup and onboarding first because every later operational record needs an institution and academic context.
 
 - [x] Local institution persistence foundation.
+- [x] ARCH-2C desktop onboarding persistence.
 - [ ] Local settings.
 - [ ] Local administrator bootstrap.
 - [ ] Academic year.
