@@ -1,97 +1,12 @@
 import type { Institution } from './types';
-
-export interface LocalRuntimeStatus {
-  initialized: boolean;
-  database_path: string;
-  root_path: string;
-  migration_version: number | null;
-}
-
-export interface CreateInstitutionInput {
-  name: string;
-  slug: string;
-  country_code?: string;
-  timezone?: string;
-  address?: string;
-  city?: string;
-  phone?: string;
-  email?: string;
-  website?: string;
-  logo_path?: string;
-  academic_year_label?: string;
-}
-
-export interface NativeInstitution {
-  id: string;
-  name: string;
-  slug: string;
-  country_code: string;
-  timezone: string;
-  address?: string;
-  city?: string;
-  phone?: string;
-  email?: string;
-  website?: string;
-  logo_path?: string;
-  academic_year_label?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-const unavailable = () =>
-  new Error('CONIK desktop runtime is not available in the current web browser.');
-
-export function isDesktopRuntime(): boolean {
-  return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
-}
-
-export const LOCAL_INSTITUTION_ID_KEY = 'conik.local.institution.id';
-
-async function invoke<T>(command: string, args?: Record<string, unknown>): Promise<T> {
-  if (typeof window === 'undefined' || !isDesktopRuntime()) throw unavailable();
-
-  try {
-    const { invoke: tauriInvoke } = await import('@tauri-apps/api/core');
-    return tauriInvoke<T>(command, args);
-  } catch (error) {
-    if (error instanceof Error) throw error;
-    throw new Error(String(error));
-  }
-}
-
-export const localRuntime = {
-  initialize(): Promise<LocalRuntimeStatus> {
-    return invoke('initialize_local_runtime');
-  },
-
-  status(): Promise<LocalRuntimeStatus> {
-    return invoke('get_local_runtime_status');
-  },
-
-  createInstitution(input: CreateInstitutionInput): Promise<NativeInstitution> {
-    return invoke('create_institution', input);
-  },
-
-  getInstitution(id: string): Promise<NativeInstitution | null> {
-    return invoke('get_institution', { id });
-  },
-};
-
-export function nativeInstitutionToDomain(input: NativeInstitution): Institution {
-  return {
-    id: input.id,
-    name: input.name,
-    slug: input.slug,
-    countryCode: input.country_code,
-    timezone: input.timezone,
-    address: input.address,
-    city: input.city,
-    phone: input.phone,
-    email: input.email,
-    website: input.website,
-    logoPath: input.logo_path,
-    academicYearLabel: input.academic_year_label,
-    createdAt: input.created_at,
-    updatedAt: input.updated_at,
-  };
-}
+export interface LocalRuntimeStatus { initialized:boolean; database_path:string; root_path:string; migration_version:number|null }
+export interface CreateInstitutionInput { name:string; slug:string; country_code?:string; timezone?:string; address?:string; city?:string; phone?:string; email?:string; website?:string; logo_path?:string; academic_year_label?:string }
+export interface NativeInstitution { id:string; name:string; slug:string; country_code:string; timezone:string; address?:string; city?:string; phone?:string; email?:string; website?:string; logo_path?:string; academic_year_label?:string; created_at:string; updated_at:string }
+export interface LocalUser { id:string; username:string; first_name:string; last_name:string; phone?:string; role:string; active:boolean; institution_id?:string; created_at:string; updated_at:string }
+export interface InstitutionSettings { institution_id:string; currency_code:string; locale:string; country_code:string; timezone:string; academic_year_label?:string; updated_at:string }
+const unavailable=()=>new Error('CONIK desktop runtime is not available in the current web browser.');
+export function isDesktopRuntime(){return typeof window!=='undefined'&&'__TAURI_INTERNALS__' in window}
+export const LOCAL_INSTITUTION_ID_KEY='conik.local.institution.id';
+async function invoke<T>(command:string,args?:Record<string,unknown>):Promise<T>{if(typeof window==='undefined'||!isDesktopRuntime())throw unavailable();try{const{invoke}=await import('@tauri-apps/api/core');return invoke<T>(command,args)}catch(e){throw e instanceof Error?e:new Error(String(e))}}
+export const localRuntime={initialize:()=>invoke<LocalRuntimeStatus>('initialize_local_runtime'),status:()=>invoke<LocalRuntimeStatus>('get_local_runtime_status'),createInstitution:(input:CreateInstitutionInput)=>invoke<NativeInstitution>('create_institution',input),getInstitution:(id:string)=>invoke<NativeInstitution|null>('get_institution',{id}),bootstrapAdmin:(input:{institution_id:string;username:string;password:string;first_name:string;last_name:string;phone?:string})=>invoke<LocalUser>('bootstrap_local_admin',input),getAdmin:(institution_id:string)=>invoke<LocalUser|null>('get_local_admin',{institution_id}),getSettings:(institution_id:string)=>invoke<InstitutionSettings|null>('get_institution_settings',{institution_id}),updateSettings:(input:Omit<InstitutionSettings,'updated_at'>)=>invoke<InstitutionSettings>('update_institution_settings',input)};
+export function nativeInstitutionToDomain(input:NativeInstitution):Institution{return{id:input.id,name:input.name,slug:input.slug,countryCode:input.country_code,timezone:input.timezone,address:input.address,city:input.city,phone:input.phone,email:input.email,website:input.website,logoPath:input.logo_path,academicYearLabel:input.academic_year_label,createdAt:input.created_at,updatedAt:input.updated_at}}
