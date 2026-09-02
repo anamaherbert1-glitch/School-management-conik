@@ -15,27 +15,27 @@ This plan is the implementation checklist for the master architecture.
 ## B. Local platform foundation
 
 - [ ] Create a local application service package.
-- [ ] Define typed repository interfaces.
-- [ ] Add SQLite driver through the desktop/native layer.
-- [ ] Add versioned SQLite migrations.
-- [ ] Add application data-directory resolver for Windows.
+- [x] Define typed repository interfaces.
+- [x] Add SQLite driver through the desktop/native layer.
+- [x] Add versioned SQLite migrations.
+- [x] Add application data-directory resolver for Windows.
 - [ ] Add local file-storage service.
 - [ ] Add local PDF/document service.
 - [ ] Add structured local logging.
 
 ## C. Desktop shell
 
-- [ ] Validate Tauri against the existing Next.js application.
-- [ ] Add Windows shell without deleting the web application.
-- [ ] Establish secure IPC commands.
-- [ ] Restrict privileged operations to explicit commands.
-- [ ] Add development and production desktop build profiles.
+- [x] Validate the desktop boundary against the existing Next.js application structure.
+- [x] Add Windows shell without deleting the web application.
+- [x] Establish the first secure IPC commands.
+- [x] Restrict privileged database operations to explicit commands.
+- [x] Add development and production desktop build profiles.
 
 ## D. First local module
 
 Migrate institution setup and onboarding first because every later operational record needs an institution and academic context.
 
-- [ ] Local institution.
+- [x] Local institution persistence foundation.
 - [ ] Local settings.
 - [ ] Local administrator bootstrap.
 - [ ] Academic year.
