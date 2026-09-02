@@ -37,8 +37,8 @@ Migrate institution setup and onboarding first because every later operational r
 
 - [x] Local institution persistence foundation.
 - [x] ARCH-2C desktop onboarding persistence.
-- [ ] Local settings.
-- [ ] Local administrator bootstrap.
+- [x] ARCH-2D local settings.
+- [x] ARCH-2D local administrator bootstrap.
 - [ ] Academic year.
 - [ ] Semesters.
 - [ ] Levels.
