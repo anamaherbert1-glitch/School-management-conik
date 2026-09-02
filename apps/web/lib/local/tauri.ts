@@ -41,8 +41,14 @@ export interface NativeInstitution {
 const unavailable = () =>
   new Error('CONIK desktop runtime is not available in the current web browser.');
 
+export function isDesktopRuntime(): boolean {
+  return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+}
+
+export const LOCAL_INSTITUTION_ID_KEY = 'conik.local.institution.id';
+
 async function invoke<T>(command: string, args?: Record<string, unknown>): Promise<T> {
-  if (typeof window === 'undefined') throw unavailable();
+  if (typeof window === 'undefined' || !isDesktopRuntime()) throw unavailable();
 
   try {
     const { invoke: tauriInvoke } = await import('@tauri-apps/api/core');
