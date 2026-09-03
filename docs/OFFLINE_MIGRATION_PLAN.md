@@ -1,6 +1,6 @@
 # CONIK Offline Migration Plan
 
-This plan is the implementation checklist for the master architecture.
+This plan is the implementation checklist for the master architecture. It is intentionally broader than the ARCH-2 foundation: existing MVP functionality remains in scope and is migrated module by module.
 
 ## A. Inventory before migration
 
@@ -31,9 +31,7 @@ This plan is the implementation checklist for the master architecture.
 - [x] Restrict privileged database operations to explicit commands.
 - [x] Add development and production desktop build profiles.
 
-## D. First local module
-
-Migrate institution setup and onboarding first because every later operational record needs an institution and academic context.
+## D. Academic foundation
 
 - [x] Local institution persistence foundation.
 - [x] ARCH-2C desktop onboarding persistence.
@@ -43,24 +41,32 @@ Migrate institution setup and onboarding first because every later operational r
 - [x] Semesters.
 - [x] Levels.
 - [x] Departments.
-- [ ] Programs.
+- [x] Programs / filières.
 - [ ] Subjects.
-- [ ] Classes.
+- [ ] Classes / groups.
 
-## E. Operational modules
+## E. MVP operational modules still to build/migrate
 
-Migrate one module at a time and run offline tests after each module:
+These are **not forgotten** and are not considered complete just because the academic foundation is progressing:
 
-1. Students and documents
-2. Admissions and enrollment
-3. Teachers and assignments
-4. Programs/curricula
-5. Grades and examinations
-6. Timetable and rooms
-7. Fees and payments
-8. Bulletins/transcripts/certificates
-9. Communication/notifications
-10. Dashboard/statistics
+1. Students and complete digital dossiers
+2. Student document storage
+3. Admissions and online/local enrollment
+4. Enrollment history and class assignments
+5. Teachers and teacher assignments
+6. Programs/curricula and program-subject relationships
+7. Grades and examinations
+8. Timetable and rooms
+9. Fees, installments, payments and receipts
+10. Bulletins, transcripts and certificates
+11. Communication and notifications
+12. Dashboard and statistics
+13. Users, roles and permissions
+14. Audit/activity logs
+15. Automatic administrative document generation
+16. Local backups and restore
+17. LAN operation through a local service
+18. Central licensing, activation, subscription and update services
 
 ## F. Reliability gates
 
