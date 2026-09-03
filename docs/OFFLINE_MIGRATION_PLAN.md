@@ -41,8 +41,8 @@ Migrate institution setup and onboarding first because every later operational r
 - [x] ARCH-2D local administrator bootstrap.
 - [x] Academic year.
 - [x] Semesters.
-- [ ] Levels.
-- [ ] Departments.
+- [x] Levels.
+- [x] Departments.
 - [ ] Programs.
 - [ ] Subjects.
 - [ ] Classes.
