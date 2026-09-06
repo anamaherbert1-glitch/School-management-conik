@@ -11,14 +11,46 @@ export interface LocalDepartment { id:string; institution_id:string; name:string
 export interface LocalProgram { id:string; institution_id:string; department_id?:string; level_id?:string; name:string; code:string; description?:string; duration_years?:number; status:string; created_at:string; updated_at:string }
 export interface LocalSubject { id:string; institution_id:string; department_id?:string; program_id?:string; name:string; code:string; description?:string; credit_hours?:number; coefficient?:number; status:string; created_at:string; updated_at:string }
 export interface LocalClassGroup { id:string; institution_id:string; program_id?:string; level_id?:string; academic_year_id?:string; name:string; code:string; capacity?:number; room_label?:string; status:string; created_at:string; updated_at:string }
+export interface LocalStudent { id:string; institution_id:string; student_number:string; first_name:string; last_name:string; gender?:string; birth_date?:string; birth_place?:string; nationality?:string; phone?:string; email?:string; address?:string; city?:string; guardian_name?:string; guardian_phone?:string; guardian_email?:string; status:string; photo_path?:string; created_at:string; updated_at:string }
+export interface LocalEnrollment { id:string; student_id:string; institution_id:string; academic_year_id:string; program_id?:string; level_id?:string; class_group_id?:string; enrollment_date:string; status:string; notes?:string; created_at:string; updated_at:string }
 const unavailable=()=>new Error('CONIK desktop runtime is not available in the current web browser.');
 export function isDesktopRuntime(){return typeof window!=='undefined'&&'__TAURI_INTERNALS__' in window}
 export const LOCAL_INSTITUTION_ID_KEY='conik.local.institution.id';
 async function invoke<T>(command:string,args?:Record<string,unknown>):Promise<T>{if(typeof window==='undefined'||!isDesktopRuntime())throw unavailable();try{const{invoke}=await import('@tauri-apps/api/core');return invoke<T>(command,args)}catch(e){throw e instanceof Error?e:new Error(String(e))}}
-export const localRuntime={initialize:()=>invoke<LocalRuntimeStatus>('initialize_local_runtime'),status:()=>invoke<LocalRuntimeStatus>('get_local_runtime_status'),createInstitution:(input:CreateInstitutionInput)=>invoke<NativeInstitution>('create_institution',input),getInstitution:(id:string)=>invoke<NativeInstitution|null>('get_institution',{id}),bootstrapAdmin:(input:{institution_id:string;username:string;password:string;first_name:string;last_name:string;phone?:string})=>invoke<LocalUser>('bootstrap_local_admin',input),getAdmin:(institution_id:string)=>invoke<LocalUser|null>('get_local_admin',{institution_id}),getSettings:(institution_id:string)=>invoke<InstitutionSettings|null>('get_institution_settings',{institution_id}),updateSettings:(input:Omit<InstitutionSettings,'updated_at'>)=>invoke<InstitutionSettings>('update_institution_settings',input),createAcademicYear:(input:{institution_id:string;label:string;start_date:string;end_date:string;set_current:boolean})=>invoke<AcademicYear>('create_academic_year',input),listAcademicYears:(institution_id:string)=>invoke<AcademicYear[]>('list_academic_years',{institution_id}),setCurrentAcademicYear:(institution_id:string,academic_year_id:string)=>invoke<AcademicYear>('set_current_academic_year',{institution_id,academic_year_id}),createSemester:(input:{academic_year_id:string;name:string;code:string;start_date:string;end_date:string;sequence:number})=>invoke<Semester>('create_semester',input)};
-export const localCatalog={createLevel:(input:{institution_id:string;name:string;code:string;description?:string;sequence:number})=>invoke<LocalLevel>('create_level',input),listLevels:(institution_id:string)=>invoke<LocalLevel[]>('list_levels',{institution_id}),createDepartment:(input:{institution_id:string;name:string;code:string;description?:string})=>invoke<LocalDepartment>('create_department',input),listDepartments:(institution_id:string)=>invoke<LocalDepartment[]>('list_departments',{institution_id}),createProgram:(input:{institution_id:string;department_id?:string;level_id?:string;name:string;code:string;description?:string;duration_years?:number})=>invoke<LocalProgram>('create_program',input),listPrograms:(institution_id:string)=>invoke<LocalProgram[]>('list_programs',{institution_id}),
-createSubject:(input:{institution_id:string;department_id?:string;program_id?:string;name:string;code:string;description?:string;credit_hours?:number;coefficient?:number})=>invoke<LocalSubject>('create_subject',input),
-listSubjects:(institution_id:string)=>invoke<LocalSubject[]>('list_subjects',{institution_id}),
-createClassGroup:(input:{institution_id:string;program_id?:string;level_id?:string;academic_year_id?:string;name:string;code:string;capacity?:number;room_label?:string})=>invoke<LocalClassGroup>('create_class_group',input),
-listClassGroups:(institution_id:string)=>invoke<LocalClassGroup[]>('list_class_groups',{institution_id})};
+export const localRuntime={
+  initialize:()=>invoke<LocalRuntimeStatus>('initialize_local_runtime'),
+  status:()=>invoke<LocalRuntimeStatus>('get_local_runtime_status'),
+  createInstitution:(input:CreateInstitutionInput)=>invoke<NativeInstitution>('create_institution',input),
+  getInstitution:(id:string)=>invoke<NativeInstitution|null>('get_institution',{id}),
+  bootstrapAdmin:(input:{institution_id:string;username:string;password:string;first_name:string;last_name:string;phone?:string})=>invoke<LocalUser>('bootstrap_local_admin',input),
+  getAdmin:(institution_id:string)=>invoke<LocalUser|null>('get_local_admin',{institution_id}),
+  getSettings:(institution_id:string)=>invoke<InstitutionSettings|null>('get_institution_settings',{institution_id}),
+  updateSettings:(input:Omit<InstitutionSettings,'updated_at'>)=>invoke<InstitutionSettings>('update_institution_settings',input),
+  createAcademicYear:(input:{institution_id:string;label:string;start_date:string;end_date:string;set_current:boolean})=>invoke<AcademicYear>('create_academic_year',input),
+  listAcademicYears:(institution_id:string)=>invoke<AcademicYear[]>('list_academic_years',{institution_id}),
+  setCurrentAcademicYear:(institution_id:string,academic_year_id:string)=>invoke<AcademicYear>('set_current_academic_year',{institution_id,academic_year_id}),
+  createSemester:(input:{academic_year_id:string;name:string;code:string;start_date:string;end_date:string;sequence:number})=>invoke<Semester>('create_semester',input),
+  listSemesters:(academic_year_id:string)=>invoke<Semester[]>('list_semesters',{academic_year_id}),
+};
+export const localCatalog={
+  createLevel:(input:{institution_id:string;name:string;code:string;description?:string;sequence:number})=>invoke<LocalLevel>('create_level',input),
+  listLevels:(institution_id:string)=>invoke<LocalLevel[]>('list_levels',{institution_id}),
+  createDepartment:(input:{institution_id:string;name:string;code:string;description?:string})=>invoke<LocalDepartment>('create_department',input),
+  listDepartments:(institution_id:string)=>invoke<LocalDepartment[]>('list_departments',{institution_id}),
+  createProgram:(input:{institution_id:string;department_id?:string;level_id?:string;name:string;code:string;description?:string;duration_years?:number})=>invoke<LocalProgram>('create_program',input),
+  listPrograms:(institution_id:string)=>invoke<LocalProgram[]>('list_programs',{institution_id}),
+  createSubject:(input:{institution_id:string;department_id?:string;program_id?:string;name:string;code:string;description?:string;credit_hours?:number;coefficient?:number})=>invoke<LocalSubject>('create_subject',input),
+  listSubjects:(institution_id:string)=>invoke<LocalSubject[]>('list_subjects',{institution_id}),
+  createClassGroup:(input:{institution_id:string;program_id?:string;level_id?:string;academic_year_id?:string;name:string;code:string;capacity?:number;room_label?:string})=>invoke<LocalClassGroup>('create_class_group',input),
+  listClassGroups:(institution_id:string)=>invoke<LocalClassGroup[]>('list_class_groups',{institution_id}),
+};
+export const localStudents={
+  createStudent:(input:{institution_id:string;student_number:string;first_name:string;last_name:string;gender?:string;birth_date?:string;birth_place?:string;nationality?:string;phone?:string;email?:string;address?:string;city?:string;guardian_name?:string;guardian_phone?:string;guardian_email?:string;photo_path?:string})=>invoke<LocalStudent>('create_student',input),
+  listStudents:(institution_id:string)=>invoke<LocalStudent[]>('list_students',{institution_id}),
+  getStudent:(id:string)=>invoke<LocalStudent|null>('get_student',{id}),
+  updateStudent:(input:{id:string;first_name?:string;last_name?:string;gender?:string;birth_date?:string;birth_place?:string;nationality?:string;phone?:string;email?:string;address?:string;city?:string;guardian_name?:string;guardian_phone?:string;guardian_email?:string;status?:string;photo_path?:string})=>invoke<LocalStudent>('update_student',input),
+  createEnrollment:(input:{student_id:string;institution_id:string;academic_year_id:string;program_id?:string;level_id?:string;class_group_id?:string;enrollment_date:string;notes?:string})=>invoke<LocalEnrollment>('create_enrollment',input),
+  listEnrollments:(institution_id:string,academic_year_id?:string)=>invoke<LocalEnrollment[]>('list_enrollments',{institution_id,academic_year_id}),
+  assignToClass:(input:{enrollment_id:string;class_group_id:string})=>invoke<LocalEnrollment>('assign_enrollment_to_class',input),
+};
 export function nativeInstitutionToDomain(input:NativeInstitution):Institution{return{id:input.id,name:input.name,slug:input.slug,countryCode:input.country_code,timezone:input.timezone,address:input.address,city:input.city,phone:input.phone,email:input.email,website:input.website,logoPath:input.logo_path,academicYearLabel:input.academic_year_label,createdAt:input.created_at,updatedAt:input.updated_at}}
