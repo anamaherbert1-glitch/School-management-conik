@@ -1,6 +1,6 @@
 # CONIK Offline Migration Plan
 
-This plan is the implementation checklist for the master architecture. It is intentionally broader than the ARCH-2 foundation: existing MVP functionality remains in scope and is migrated module by module.
+This plan is the implementation checklist for the master architecture.
 
 ## A. Inventory before migration
 
@@ -17,7 +17,7 @@ This plan is the implementation checklist for the master architecture. It is int
 - [ ] Create a local application service package.
 - [x] Define typed repository interfaces.
 - [x] Add SQLite driver through the desktop/native layer.
-- [x] Add versioned SQLite migrations.
+- [x] Add versioned SQLite migrations (001-007).
 - [x] Add application data-directory resolver for Windows.
 - [ ] Add local file-storage service.
 - [ ] Add local PDF/document service.
@@ -28,6 +28,7 @@ This plan is the implementation checklist for the master architecture. It is int
 - [x] Validate the desktop boundary against the existing Next.js application structure.
 - [x] Add Windows shell without deleting the web application.
 - [x] Establish the first secure IPC commands.
+- [ ] **Restore full command set in lib.rs after truncated push (see docs/LIB_RESTORE.md)**.
 - [x] Restrict privileged database operations to explicit commands.
 - [x] Add development and production desktop build profiles.
 
@@ -42,65 +43,36 @@ This plan is the implementation checklist for the master architecture. It is int
 - [x] Levels.
 - [x] Departments.
 - [x] Programs / filières.
-- [ ] Subjects.
-- [ ] Classes / groups.
+- [x] Subjects (migration 006 + TS bridge).
+- [x] Classes / groups (migration 006 + TS bridge).
 
-## E. MVP operational modules still to build/migrate
+## E. MVP operational modules
 
-These are **not forgotten** and are not considered complete just because the academic foundation is progressing:
-
-1. Students and complete digital dossiers
-2. Student document storage
-3. Admissions and online/local enrollment
-4. Enrollment history and class assignments
-5. Teachers and teacher assignments
-6. Programs/curricula and program-subject relationships
-7. Grades and examinations
-8. Timetable and rooms
-9. Fees, installments, payments and receipts
-10. Bulletins, transcripts and certificates
-11. Communication and notifications
-12. Dashboard and statistics
-13. Users, roles and permissions
-14. Audit/activity logs
-15. Automatic administrative document generation
-16. Local backups and restore
-17. LAN operation through a local service
-18. Central licensing, activation, subscription and update services
+1. [x] Students schema + TS bridge (migration 007) — **native commands pending lib.rs restore**
+2. [ ] Student document storage
+3. [ ] Admissions and online/local enrollment
+4. [x] Enrollment schema + assign-to-class API surface
+5. [ ] Teachers and teacher assignments
+6. [ ] Grades and examinations
+7. [ ] Timetable and rooms
+8. [ ] Fees, installments, payments and receipts
+9. [ ] Bulletins, transcripts and certificates
+10. [ ] Communication and notifications
+11. [ ] Dashboard and statistics
+12. [ ] Users, roles and permissions (local auth session)
+13. [ ] Audit/activity logs
+14. [ ] Local backups and restore
+15. [ ] LAN operation through a local service
+16. [ ] Central licensing, activation, subscription and update services
 
 ## F. Reliability gates
 
-A module is not considered migrated until:
-
-- create works offline;
-- read/search works offline;
-- update works offline;
-- delete/archival rules work offline;
-- data survives application restart;
-- generated files are stored locally;
-- authorization is enforced;
-- backup includes the module's data;
-- restore reproduces the expected data;
-- no cloud request is required for normal operation.
+A module is not considered migrated until create/read/update work offline, data survives restart, authorization is enforced, and no cloud request is required for normal operation.
 
 ## G. Central services
 
-Only after the local operational foundation is stable:
-
-- license activation;
-- signed license token;
-- offline grace period;
-- device activation/deactivation;
-- subscription/billing integration;
-- update service.
+Only after the local operational foundation is stable: license activation, offline token, device management, subscriptions, updates.
 
 ## H. Release
 
-- Windows installer.
-- Database migration on upgrade.
-- Safe application-data preservation.
-- Backup before major upgrade.
-- Offline acceptance test.
-- LAN acceptance test.
-- Security review.
-- Performance review.
+Windows installer, migration on upgrade, offline acceptance test, security and performance review.
