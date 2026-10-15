@@ -19,7 +19,7 @@ This plan is the implementation checklist for the master architecture.
 - [x] Add SQLite driver through the desktop/native layer.
 - [x] Add versioned SQLite migrations (001-007).
 - [x] Add application data-directory resolver for Windows.
-- [ ] Add local file-storage service.
+- [x] Add local file-storage service (student documents foundation).
 - [ ] Add local PDF/document service.
 - [ ] Add structured local logging.
 
@@ -49,7 +49,7 @@ This plan is the implementation checklist for the master architecture.
 ## E. MVP operational modules
 
 1. [x] Students: native commands + screens on local SQLite (list, create, dossier, edit) — /students, /students/view?id=
-2. [ ] Student document storage
+2. [x] Student document storage (ARCH-2I — migration 008 + Tauri commands + dossier UI)
 3. [ ] Admissions and online/local enrollment
 4. [x] Enrollment schema + assign-to-class API surface
 5. [ ] Teachers and teacher assignments
