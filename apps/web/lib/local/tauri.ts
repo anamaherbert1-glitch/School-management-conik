@@ -2,7 +2,7 @@ import type { Institution } from './types';
 export interface LocalRuntimeStatus { initialized:boolean; database_path:string; root_path:string; migration_version:number|null }
 export interface CreateInstitutionInput { name:string; slug:string; country_code?:string; timezone?:string; address?:string; city?:string; phone?:string; email?:string; website?:string; logo_path?:string; academic_year_label?:string }
 export interface NativeInstitution { id:string; name:string; slug:string; country_code:string; timezone:string; address?:string; city?:string; phone?:string; email?:string; website?:string; logo_path?:string; academic_year_label?:string; created_at:string; updated_at:string }
-export interface LocalUser { id:string; username:string; first_name:string; last_name:string; phone?:string; role:string; active:boolean; institution_id?:string; created_at:string; updated_at:string }
+export interface NativeLocalUser { id:string; username:string; first_name:string; last_name:string; phone?:string; role:string; active:boolean; institution_id?:string; created_at:string; updated_at:string }
 export interface InstitutionSettings { institution_id:string; currency_code:string; locale:string; country_code:string; timezone:string; academic_year_label?:string; updated_at:string }
 export interface AcademicYear { id:string; institution_id:string; label:string; start_date:string; end_date:string; status:string; is_current:boolean; created_at:string; updated_at:string }
 export interface Semester { id:string; academic_year_id:string; name:string; code:string; start_date:string; end_date:string; sequence:number; status:string; created_at:string; updated_at:string }
@@ -22,8 +22,8 @@ export const localRuntime={
   status:()=>invoke<LocalRuntimeStatus>('get_local_runtime_status'),
   createInstitution:(input:CreateInstitutionInput)=>invoke<NativeInstitution>('create_institution',input),
   getInstitution:(id:string)=>invoke<NativeInstitution|null>('get_institution',{id}),
-  bootstrapAdmin:(input:{institution_id:string;username:string;password:string;first_name:string;last_name:string;phone?:string})=>invoke<LocalUser>('bootstrap_local_admin',input),
-  getAdmin:(institution_id:string)=>invoke<LocalUser|null>('get_local_admin',{institution_id}),
+  bootstrapAdmin:(input:{institution_id:string;username:string;password:string;first_name:string;last_name:string;phone?:string})=>invoke<NativeLocalUser>('bootstrap_local_admin',input),
+  getAdmin:(institution_id:string)=>invoke<NativeLocalUser|null>('get_local_admin',{institution_id}),
   getSettings:(institution_id:string)=>invoke<InstitutionSettings|null>('get_institution_settings',{institution_id}),
   updateSettings:(input:Omit<InstitutionSettings,'updated_at'>)=>invoke<InstitutionSettings>('update_institution_settings',input),
   createAcademicYear:(input:{institution_id:string;label:string;start_date:string;end_date:string;set_current:boolean})=>invoke<AcademicYear>('create_academic_year',input),
