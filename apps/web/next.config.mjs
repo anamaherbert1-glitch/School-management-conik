@@ -6,7 +6,14 @@ const isDesktop = process.env.CONIK_TARGET === 'desktop'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  ...(isDesktop ? { output: 'export', images: { unoptimized: true }, trailingSlash: true } : {}),
+  ...(isDesktop
+    ? { output: 'export', images: { unoptimized: true }, trailingSlash: true }
+    : {
+        // Old dossier links keep working on the web version.
+        async redirects() {
+          return [{ source: '/students/:id((?!view).+)', destination: '/students/view/?id=:id', permanent: true }]
+        },
+      }),
 }
 
 export default nextConfig

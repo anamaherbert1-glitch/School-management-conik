@@ -1,6 +1,7 @@
 export * from './paths';
 export * from './types';
 export * from './tauri';
+export type { LocalUser } from './types';
 
 /**
  * Operational data must eventually flow through this boundary.

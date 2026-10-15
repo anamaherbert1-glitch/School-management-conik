@@ -48,7 +48,7 @@ This plan is the implementation checklist for the master architecture.
 
 ## E. MVP operational modules
 
-1. [x] Students schema + TS bridge (migration 007) — **native commands pending lib.rs restore**
+1. [x] Students: native commands + screens on local SQLite (list, create, dossier, edit) — /students, /students/view?id=
 2. [ ] Student document storage
 3. [ ] Admissions and online/local enrollment
 4. [x] Enrollment schema + assign-to-class API surface

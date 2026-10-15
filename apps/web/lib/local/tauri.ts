@@ -16,7 +16,7 @@ export interface LocalEnrollment { id:string; student_id:string; institution_id:
 const unavailable=()=>new Error('CONIK desktop runtime is not available in the current web browser.');
 export function isDesktopRuntime(){return typeof window!=='undefined'&&'__TAURI_INTERNALS__' in window}
 export const LOCAL_INSTITUTION_ID_KEY='conik.local.institution.id';
-async function invoke<T>(command:string,args?:Record<string,unknown>):Promise<T>{if(typeof window==='undefined'||!isDesktopRuntime())throw unavailable();try{const{invoke}=await import('@tauri-apps/api/core');return invoke<T>(command,args)}catch(e){throw e instanceof Error?e:new Error(String(e))}}
+async function invoke<T>(command:string,args?:object):Promise<T>{if(typeof window==='undefined'||!isDesktopRuntime())throw unavailable();try{const{invoke}=await import('@tauri-apps/api/core');return invoke<T>(command,args as Record<string,unknown>|undefined)}catch(e){throw e instanceof Error?e:new Error(String(e))}}
 export const localRuntime={
   initialize:()=>invoke<LocalRuntimeStatus>('initialize_local_runtime'),
   status:()=>invoke<LocalRuntimeStatus>('get_local_runtime_status'),
