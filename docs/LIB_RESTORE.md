@@ -1,32 +1,26 @@
-# Restauration lib.rs (URGENT)
+# Restauration du runtime Tauri
 
-Le fichier `apps/desktop/src-tauri/src/lib.rs` a été tronqué par erreur lors d'un push automatisé.
+## Contexte
 
-## État actuel sur main
+Le fichier `apps/desktop/src-tauri/src/lib.rs` avait été tronqué : il ne contenait plus que l'initialisation du runtime et l'enregistrement de deux commandes. Le pont TypeScript continuait pourtant d'appeler les commandes locales pour les établissements, les années scolaires, les matières, les classes, les élèves et les inscriptions.
 
-- Migrations SQL **006** (matières/classes) et **007** (étudiants/inscriptions) : OK
-- Bridge TypeScript `tauri.ts` avec `localCatalog` + `localStudents` : OK  
-- Docs ARCH-2G et ARCH-2H : OK
-- `lib.rs` natif : **incomplet** (init runtime + migrations seulement)
+## Correctif proposé
 
-## Restauration rapide
+La branche `fix/restore-offline-tauri-domain-commands` restaure les commandes métier historiques et ajoute les commandes nécessaires aux migrations SQLite 006 et 007.
 
-```bash
-git clone https://github.com/anamaherbert1-glitch/School-management-conik.git
-cd School-management-conik
+- Migrations automatiques jusqu'à la version 7.
+- Commandes locales pour établissements, administrateurs, paramètres, années scolaires, semestres, niveaux, départements, programmes, matières, classes, élèves et inscriptions.
+- Vérifications côté natif des références à l'établissement et de la cohérence année scolaire/classe.
+- Les noms des 30 commandes du pont TypeScript ont été comparés aux fonctions Rust et à `tauri::generate_handler!`.
 
-# Version complète des commandes métier (avant troncature)
-git show 88842589cacdda376b9185b8c0632f4f7fcca441:apps/desktop/src-tauri/src/lib.rs > apps/desktop/src-tauri/src/lib.rs
-```
+## Validation restante
 
-Ensuite ajouter les constantes MIGRATION_006 / MIGRATION_007 et le chaînage `if v<6` / `if v<7` dans `open_database()`, puis les commandes subjects / class_groups / students / enrollments (voir `docs/ARCH-2G.md` et `docs/ARCH-2H.md`).
+La correspondance des commandes a été vérifiée statiquement. La compilation Rust (`cargo check`), les tests SQLite et la création d'un paquet Windows doivent encore être exécutés avant de considérer la restauration comme validée.
 
-## Fichier complet prêt
+## Critères de validation offline
 
-Le workspace de session contient `lib_full.rs` (41 Ko) avec tout le runtime natif jusqu'aux étudiants. Le coller dans `apps/desktop/src-tauri/src/lib.rs` puis commit/push depuis ta machine.
-
-```bash
-git add apps/desktop/src-tauri/src/lib.rs
-git commit -m "fix(desktop): restore full Tauri SQLite commands including students"
-git push
-```
+1. Initialiser le runtime sans connexion réseau.
+2. Créer et relire un établissement et un administrateur local.
+3. Créer une année scolaire, des matières et une classe.
+4. Créer un élève, l'inscrire à une année et l'affecter à une classe.
+5. Fermer puis relancer l'application et confirmer que les données sont toujours présentes.
