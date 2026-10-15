@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev apps/web",
     "build": "next build apps/web",
-    "lint": "next lint apps/web",
+    "lint": "eslint .",
     "typecheck": "tsc -p apps/web/tsconfig.json --noEmit",
     "desktop:dev": "tauri dev --config apps/desktop/src-tauri/tauri.conf.json",
     "desktop:build": "tauri build --config apps/desktop/src-tauri/tauri.conf.json"
@@ -19,7 +19,10 @@
     "react-dom": "latest"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "latest",
     "@tauri-apps/cli": "^2.8.0",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
