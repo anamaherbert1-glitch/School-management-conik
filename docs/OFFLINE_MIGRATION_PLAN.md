@@ -28,7 +28,7 @@ This plan is the implementation checklist for the master architecture.
 - [x] Validate the desktop boundary against the existing Next.js application structure.
 - [x] Add Windows shell without deleting the web application.
 - [x] Establish the first secure IPC commands.
-- [ ] **Restore full command set in lib.rs after truncated push (see docs/LIB_RESTORE.md)**.
+- [x] Restore full command set in lib.rs (30 commands, migrations 001-007).
 - [x] Restrict privileged database operations to explicit commands.
 - [x] Add development and production desktop build profiles.
 
